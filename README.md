@@ -132,10 +132,6 @@ npm run dev
 ### Erişim
 - **Frontend:** http://localhost:5173
 - **Backend API:** http://localhost:5000
-- **Demo Hesap:** 
-  - Email: `ahmet.yilmaz@example.com`
-  - Şifre: `123456`
-
 ---
 
 ## Test Senaryoları
@@ -168,15 +164,3 @@ npm run dev
 - **Input Validation** - Kullanıcı girdisi doğrulama
 - **CORS Protection** - Cross-origin request koruması
 - **Error Handling** - Güvenli hata yönetimi
-
----
-
-## Responsive Design
-
-- **Desktop** - Tam özellikli arayüz
-- **Tablet** - Optimize edilmiş layout
-- **Mobile** - Touch-friendly tasarım
-- **Cross-browser** - Modern tarayıcı desteği
-
----
-# grispi_customer_portal-
