@@ -1,315 +1,525 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Card, 
-  Button, 
-  Input, 
-  Select, 
-  Space, 
-  Tag, 
-  Typography, 
-  Tooltip, 
-  Pagination,
+import React, { useEffect, useMemo, useState } from 'react';
+import {
+  Card,
+  Table,
+  Tag,
+  Space,
+  Input,
+  Select,
+  Avatar,
+  Button,
   Row,
   Col,
-  Statistic,
+  Tabs,
+  DatePicker,
   Empty,
   Spin,
-  Table
+  Typography,
+  Tooltip
 } from 'antd';
-import { 
-  SearchOutlined, 
-  PlusOutlined, 
-  EyeOutlined, 
+import {
+  MoreOutlined,
+  EyeOutlined,
   ReloadOutlined,
-  FileTextOutlined,
-  ClockCircleOutlined,
-  CheckCircleOutlined,
-  ExclamationCircleOutlined
-} from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
-import axios from 'axios';
 
-const { Title, Text, Paragraph } = Typography;
+} from '@ant-design/icons';
+import dayjs from 'dayjs';
+import api from '../utils/axios'; 
+import { useNavigate } from 'react-router-dom';
+
+const { Title, Text } = Typography;
 const { Search } = Input;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
+const { TabPane } = Tabs;
 
-const TalepListesi = () => {
+const ornek_talep = [
+  {
+    _id: '254',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category1',
+    oncelik: 'Yüksek',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 4,
+    tumu: true,
+    cc: false,
+    follower: false,
+  },
+  {
+    _id: '251',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Kapalı', 
+    kategori: 'category2',
+    oncelik: 'Yüksek',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 2,
+    tumu: true,
+    cc: true,
+    follower: false,
+  },
+  {
+    _id: '2711',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category3',
+    oncelik: 'Düşük',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 0,
+    tumu: true,
+    cc: false,
+    follower: true,
+  },
+  {
+    _id: '101',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category4',
+    oncelik: 'Normal',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 4,
+    tumu: true,
+    cc: false,
+    follower: false,
+  },
+  {
+    _id: '589',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Kapalı', 
+    kategori: 'category5',
+    oncelik: 'Normal',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 2,
+    tumu: true,
+    cc: true,
+    follower: false,
+  },
+  {
+    _id: '543',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category6',
+    oncelik: 'Düşük',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 0,
+    tumu: true,
+    cc: false,
+    follower: true,
+  },
+  {
+    _id: '2541',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category1',
+    oncelik: 'Yüksek',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 4,
+    tumu: false,
+    cc: true,
+    follower: false,
+  },
+  {
+    _id: '2511',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Kapalı', 
+    kategori: 'category2',
+    oncelik: 'Yüksek',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 2,
+    tumu: false,
+    cc: true,
+    follower: false,
+  },
+  {
+    _id: '271',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category3',
+    oncelik: 'Düşük',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 0,
+    tumu: false,
+    cc: false,
+    follower: true,
+  },
+  {
+    _id: '1011',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category4',
+    oncelik: 'Normal',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 4,
+    tumu: false,
+    cc: false,
+    follower: true,
+  },
+  {
+    _id: '5891',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Kapalı', 
+    kategori: 'category5',
+    oncelik: 'Normal',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 2,
+    tumu: false,
+    cc: true,
+    follower: false,
+  },
+  {
+    _id: '5431',
+    baslik: 'Example Ticket Headline',
+    aciklama: 'Example Ticket Headline',
+    durum: 'Açık', 
+    kategori: 'category6',
+    oncelik: 'Düşük',
+    guncellemeTarihi: '2025-02-15T14:30:00Z',
+    olusturmaTarihi: '2025-01-24T09:12:00Z',
+    mesajlar: 0,
+    tumu: false,
+    cc: false,
+    follower: true,
+  }
+];
+
+
+
+const durumRenk = (durum) => {
+  switch (durum) {
+    case 'Açık':
+      return '#f5222d'; 
+    case 'İşlemde':
+      return '#fa8c16';
+    case 'Beklemede':
+      return '#faad14'; 
+    case 'Çözüldü':
+      return '#52c41a';
+    case 'Kapalı':
+      return '#52c41a';
+    default:
+      return '#8c8c8c';
+  }
+};
+
+const oncelikRenk = (o) => {
+  switch (o) {
+    case 'Acil':
+      return 'red';
+    case 'Yüksek':
+      return 'orange';
+    case 'Normal':
+      return 'blue';
+    case 'Düşük':
+      return 'green';
+    default:
+      return 'default';
+  }
+};
+
+const durumKisaltma = (durum) => {
+  if (!durum) return '';
+  switch (durum) {
+    case 'Açık':
+      return 'O';
+    case 'Çözüldü':
+      return 'ç';
+    case 'İşlemde':
+      return 'İ';
+    case 'Beklemede':
+      return 'B';
+    case 'Kapalı':
+      return 'C';
+    default:
+      return durum[0];
+  }
+};
+
+export default function TalepListesi() {
+  const navigate = useNavigate();
+
   const [talepler, setTalepler] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filtreler, setFiltreler] = useState({ 
-    durum: '', 
-    kategori: '', 
-    oncelik: '', 
-    arama: '' 
-  });
-  const [pagination, setPagination] = useState({ 
-    current: 1, 
-    pageSize: 6 
-  });
-  
-  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('my'); 
+  const [searchText, setSearchText] = useState('');
+  const [durumFilter, setDurumFilter] = useState('');
+  const [kategoriFilter, setKategoriFilter] = useState('');
+  const [oncelikFilter, setOncelikFilter] = useState('');
+  const [dateRange, setDateRange] = useState(null);
+  const [orderBy, setOrderBy] = useState('guncelleme'); 
+
   useEffect(() => {
-    setLoading(true);
-    axios.get('/api/ticket')
-      .then(res => {
-        if (res.data && res.data.success) {
-          setTalepler(res.data.data);
-        } else {
-          setTalepler([]);
-        }
-      })
-      .catch(() => {
-        setTalepler([]);
-      })
-      .finally(() => setLoading(false));
+    fetchTickets();
   }, []);
 
+  const fetchTickets = async () => {
+    setLoading(true);
+    let data = [];
+    try {
+      if (api && typeof api.get === 'function') {
+        const res = await api.get('/ticket');
+        if (res && res.data) {
+          if (Array.isArray(res.data)) data = res.data;
+          else if (Array.isArray(res.data.data)) data = res.data.data;
+        }
+      }
+    } catch (err) {
 
-  const filtreliTalepler = talepler.filter(talep => {
-    const durum = filtreler.durum ? talep.durum === filtreler.durum : true;
-    const kategori = filtreler.kategori ? talep.kategori === filtreler.kategori : true;
-    const oncelik = filtreler.oncelik ? talep.oncelik === filtreler.oncelik : true;
-    const arama = filtreler.arama ? talep.baslik.toLowerCase().includes(filtreler.arama.toLowerCase()) : true;
-    
-    return durum && kategori && oncelik && arama;
-  });
-
-  const pagedTalepler = filtreliTalepler.slice(
-    (pagination.current - 1) * pagination.pageSize,
-    pagination.current * pagination.pageSize
-  );
-
-  const durumRengi = (durum) => {
-    switch (durum) {
-      case 'Açık': return 'blue';
-      case 'İşlemde': return 'orange';
-      case 'Beklemede': return 'yellow';
-      case 'Çözüldü': return 'green';
-      case 'Kapalı': return 'default';
-      default: return 'default';
     }
+
+    if (!data || data.length === 0) data = ornek_talep;
+
+    const normalized = data.map(item => ({
+      ...item,
+      olusturmaTarihi: item.olusturmaTarihi || item.createdAt || item.created_at || item.created || null,
+      guncellemeTarihi: item.guncellemeTarihi || item.updatedAt || item.updated_at || item.updated || item.guncellemeTarihi || null
+    }));
+
+    setTalepler(normalized);
+    setLoading(false);
   };
 
+  const filtered = useMemo(() => {
+    return talepler
+    .filter(t => {
+      switch (activeTab) {
+        case 'my':
+          return t.tumu === true;
+        case 'cc':
+          return t.cc === true;
+        case 'follower':
+          return t.follower === true;
+        default:
+          return true;
+      }
+    })
+      .filter(t => {
+        if (durumFilter) return t.durum === durumFilter;
+        return true;
+      })
+      .filter(t => {
+        if (kategoriFilter) return t.kategori === kategoriFilter;
+        return true;
+      })
+      .filter(t => {
+        if (oncelikFilter) return t.oncelik === oncelikFilter;
+        return true;
+      })
+      .filter(t => {
+        if (dateRange && dateRange.length === 2) {
+          const start = dayjs(dateRange[0]).startOf('day');
+          const end = dayjs(dateRange[1]).endOf('day');
+          const updated = dayjs(t.guncellemeTarihi || t.olusturmaTarihi);
+          return updated.isAfter(start) && updated.isBefore(end) || updated.isSame(start) || updated.isSame(end);
+        }
+        return true;
+      })
+      .filter(t => {
+        if (!searchText) return true;
+        const q = searchText.toLowerCase();
+        return (
+          (t.baslik && t.baslik.toLowerCase().includes(q)) ||
+          (t.aciklama && t.aciklama.toLowerCase().includes(q)) ||
+          (t._id && t._id.toString().toLowerCase().includes(q))
+        );
+      })
+      .sort((a, b) => {
+        if (orderBy === 'guncelleme') return dayjs(b.guncellemeTarihi).unix() - dayjs(a.guncellemeTarihi).unix();
+        if (orderBy === 'olusturma') return dayjs(b.olusturmaTarihi).unix() - dayjs(a.olusturmaTarihi).unix();
+        if (orderBy === 'oncelik') {
+          const order = { 'Acil': 4, 'Yüksek': 3, 'Normal': 2, 'Düşük': 1 };
+          return (order[b.oncelik] || 0) - (order[a.oncelik] || 0);
+        }
+        return 0;
+      });
+  }, [talepler, activeTab, searchText, durumFilter, kategoriFilter, oncelikFilter, dateRange, orderBy]);
 
-  const oncelikRengi = (oncelik) => {
-    switch (oncelik) {
-      case 'Acil': return 'red';
-      case 'Yüksek': return 'orange';
-      case 'Normal': return 'blue';
-      case 'Düşük': return 'green';
-      default: return 'default';
-    }
-  };
-
-  const durumIconu = (durum) => {
-    switch (durum) {
-      case 'Açık': return <ExclamationCircleOutlined />;
-      case 'İşlemde': return <ClockCircleOutlined />;
-      case 'Beklemede': return <ClockCircleOutlined />;
-      case 'Çözüldü': return <CheckCircleOutlined />;
-      case 'Kapalı': return <FileTextOutlined />;
-      default: return <FileTextOutlined />;
-    }
-  };
-
-
-  const istatistikler = {
-    toplam: talepler.length,
-    acik: talepler.filter(t => t.durum === 'Açık').length,
-    cozuldu: talepler.filter(t => t.durum === 'Çözüldü').length,
-    islemde: talepler.filter(t => t.durum === 'İşlemde').length
-  };
-
-  const handleFiltreDegisikligi = (key, value) => {
-    setFiltreler(prev => ({ ...prev, [key]: value }));
-    setPagination(prev => ({ ...prev, current: 1 }));
-  };
-  const handleArama = (value) => {
-    setFiltreler(prev => ({ ...prev, arama: value }));
-    setPagination(prev => ({ ...prev, current: 1 }));
-  };
-
-  if (loading) {
-    return (
-      <div className="loading-container">
-        <Spin size="large" />
-      </div>
-    );
-  }
   const columns = [
     {
-      title: '',
+      title: 'Status',
       dataIndex: 'durum',
-      key: 'durum',
-      width: 48,
-      align: 'center',
-      render: (text) => {
-        let color = '#1890ff';
-        let icon = <ExclamationCircleOutlined />;
-        if (text === 'Açık') { color = '#1890ff'; icon = <ExclamationCircleOutlined />;}
-        else if (text === 'İşlemde') { color = '#fa8c16'; icon = <ClockCircleOutlined />;}
-        else if (text === 'Beklemede') { color = '#faad14'; icon = <ClockCircleOutlined />;}
-        else if (text === 'Çözüldü') { color = '#52c41a'; icon = <CheckCircleOutlined />;}
-        else if (text === 'Kapalı') { color = '#bfbfbf'; icon = <FileTextOutlined />;}
-        return <span style={{ color, fontSize: 20 }}>{icon}</span>;
-      }
+      key: 'status',
+      width: 80,
+      render: (durum) => (
+        <Avatar style={{ backgroundColor: durumRenk(durum), verticalAlign: 'middle', fontWeight: 700 }}>
+          {durumKisaltma(durum)}
+        </Avatar>
+      )
     },
     {
-      title: 'Talep No',
-      dataIndex: 'talepNumarasi',
-      key: 'talepNumarasi',
-      width: 90,
-      render: (text) => <span style={{ fontWeight: 600 }}>{text}</span>
+      title: 'Ticket ID',
+      dataIndex: '_id',
+      key: 'id',
+      width: 110,
+      render: (id) => <Text code>{`#${id}`}</Text>
     },
     {
-      title: 'Konu',
+      title: 'Subject',
       dataIndex: 'baslik',
       key: 'baslik',
       render: (text, record) => (
-        <span style={{ color: '#1890ff', fontWeight: 500, cursor: 'pointer' }} onClick={() => navigate(`/talep/${record._id}`)}>{text}</span>
+        <div>
+          <Text strong style={{ cursor: 'pointer', color: '#722ED1' }} onClick={() => navigate(`/talep/${record._id}`)}>
+            {text}
+          </Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: 12 }}>
+            {record.aciklama && record.aciklama.length > 60 ? `${record.aciklama.substring(0, 60)}...` : record.aciklama}
+          </Text>
+        </div>
       )
     },
     {
-      title: 'Öncelik',
+      title: 'Priority',
       dataIndex: 'oncelik',
       key: 'oncelik',
-      width: 90,
-      render: (text) => {
-        let color = '#1890ff';
-        if (text === 'Acil') color = '#f5222d';
-        else if (text === 'Yüksek') color = '#fa8c16';
-        else if (text === 'Normal') color = '#1890ff';
-        else if (text === 'Düşük') color = '#52c41a';
-        return <span style={{ color, fontWeight: 600 }}>{text}</span>;
-      }
+      width: 100,
+      render: (o) => <Tag color={oncelikRenk(o)} style={{ textTransform: 'capitalize' }}>{o}</Tag>
     },
     {
-      title: 'Kategori',
+      title: 'Category',
       dataIndex: 'kategori',
       key: 'kategori',
       width: 120,
-      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
+      render: (k) => <Tag>{k}</Tag>
     },
     {
-      title: 'Son Güncelleme',
-      dataIndex: 'sonGuncelleme',
-      key: 'sonGuncelleme',
+      title: 'Update Date',
+      dataIndex: 'guncellemeTarihi',
+      key: 'guncellemeTarihi',
       width: 120,
-      render: (text) => dayjs(text).format('DD.MM.YYYY')
+      render: (d) => (
+        <div>
+          <Text>{d ? dayjs(d).format('DD.MM.YYYY') : '-'}</Text>
+        </div>
+      )
     },
     {
-      title: 'Oluşturulma Tarihi',
-      dataIndex: 'createdAt',
-      key: 'createdAt',
+      title: 'Created Date',
+      dataIndex: 'olusturmaTarihi',
+      key: 'olusturmaTarihi',
       width: 120,
-      render: (text) => dayjs(text).format('DD.MM.YYYY')
+      render: (d) => <Text>{d ? dayjs(d).format('DD.MM.YYYY') : '-'}</Text>
     },
     {
-      title: '',
-      key: 'islemler',
-      width: 60,
-      align: 'center',
+      title: 'Actions',
+      key: 'actions',
+      width: 80,
       render: (_, record) => (
-        <Button
-          type="link"
-          icon={<EyeOutlined style={{ fontSize: 18 }} />}
-          style={{ color: '#6C3FC5', fontWeight: 600 }}
-          onClick={() => navigate(`/talep/${record._id}`)}
-        />
+        <Space>
+          <Tooltip title="Görüntüle">
+            <Button shape="circle" icon={<EyeOutlined />} size="small" onClick={() => navigate(`/talep/${record._id}`)} />
+          </Tooltip>
+          <Tooltip title="Diğer">
+            <Button shape="circle" icon={<MoreOutlined />} size="small" />
+          </Tooltip>
+        </Space>
       )
     }
   ];
-  const dataSource = filtreliTalepler.map(t => ({ ...t, key: t._id }));
 
   return (
-    <div className="fade-in">
-      <div className="page-header" style={{ marginBottom: 16 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
-          <span className="page-title" style={{ fontSize: 22, fontWeight: 600, color: '#222', marginBottom: 6 }}>Taleplerim</span>
-          <Button
-            type="primary"
-            icon={<PlusOutlined style={{ fontSize: 18, marginRight: 4 }} />}
-            size="large"
-            style={{ borderRadius: 8, fontWeight: 600, fontSize: 16, height: 44, minWidth: 120, background: '#6C3FC5', borderColor: '#6C3FC5' }}
-            onClick={() => navigate('/talep-olustur')}
-          >
-            Yeni Talep
-          </Button>
+    <div className="ticket-page" style={{ padding: 20 }}>
+
+      <div className="top-row">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <Title level={3} style={{ margin: 0 }}>Destek Taleplerim</Title>
         </div>
-        <div className="filter-container" style={{ display: 'flex', flexWrap: 'wrap', gap: 16, alignItems: 'center', marginBottom: 0 }}>
-          <Search
-            placeholder="Talep ara..."
-            allowClear
-            style={{ width: 300, borderRadius: 8 }}
-            onSearch={handleArama}
-            onPressEnter={(e) => handleArama(e.target.value)}
-          />
-          <Select
-            placeholder="Durum"
-            allowClear
-            style={{ width: 130, borderRadius: 8 }}
-            onChange={(value) => handleFiltreDegisikligi('durum', value)}
-          >
-            <Option value="Açık">Açık</Option>
-            <Option value="İşlemde">İşlemde</Option>
-            <Option value="Beklemede">Beklemede</Option>
-            <Option value="Çözüldü">Çözüldü</Option>
-            <Option value="Kapalı">Kapalı</Option>
+
+        <div className="right-controls">
+          <Search placeholder="Talep ara" allowClear onSearch={setSearchText} onChange={(e) => setSearchText(e.target.value)} style={{ width: 220 }} value={searchText} />
+          <Select value={orderBy} onChange={setOrderBy} style={{ width: 160 }}>
+            <Option value="guncelleme">Sırala: Güncelleme Tarihi</Option>
+            <Option value="olusturma">Sırala: Oluşturulma Tarihi</Option>
+            <Option value="oncelik">Sırala: Önceliğe Göre</Option>
           </Select>
-          <Select
-            placeholder="Kategori"
-            allowClear
-            style={{ width: 130, borderRadius: 8 }}
-            onChange={(value) => handleFiltreDegisikligi('kategori', value)}
-          >
-            <Option value="Teknik Destek">Teknik</Option>
-            <Option value="Fatura">Fatura</Option>
-            <Option value="Genel">Genel</Option>
-            <Option value="Özellik Talebi">Özellik</Option>
-            <Option value="Hata Bildirimi">Hata</Option>
-          </Select>
-          <Select
-            placeholder="Öncelik"
-            allowClear
-            style={{ width: 130, borderRadius: 8 }}
-            onChange={(value) => handleFiltreDegisikligi('oncelik', value)}
-          >
-            <Option value="Düşük">Düşük</Option>
-            <Option value="Normal">Normal</Option>
-            <Option value="Yüksek">Yüksek</Option>
-            <Option value="Acil">Acil</Option>
-          </Select>
-          <Button
-            icon={<ReloadOutlined />}
-            style={{ borderRadius: 8, fontWeight: 500, fontSize: 15, height: 44 }}
-            onClick={() => {
-              setFiltreler({ durum: '', kategori: '', oncelik: '', arama: '' });
-              setPagination(prev => ({ ...prev, current: 1 }));
-            }}
-          >
-            Temizle
-          </Button>
+          <Button className='save-btn' icon={<ReloadOutlined />} onClick={fetchTickets}>Yenile</Button>
         </div>
       </div>
-      <Table
-        columns={columns}
-        dataSource={dataSource}
-        pagination={{
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: filtreliTalepler.length,
-          showSizeChanger: false,
-          showQuickJumper: true,
-          showTotal: (total, range) => `${range[0]}-${range[1]} / ${total} talep`,
-          onChange: (page) => setPagination(prev => ({ ...prev, current: page }))
-        }}
-        bordered
-        style={{ background: '#fff', borderRadius: 12, boxShadow: '0 4px 24px rgba(24,144,255,0.08)', marginTop: 0 }}
-        size="middle"
-      />
-      <div style={{ height: 24 }} />
+
+      <Card style={{ marginBottom: 12 }}>
+        <Tabs activeKey={activeTab} onChange={setActiveTab} type="card">
+          <TabPane tab={<span>My Requests</span>} key="my" />
+          <TabPane tab={<span>Requests I'm CC'd On</span>} key="cc" />
+          <TabPane tab={<span>Requests I'm Followers On</span>} key="follower" />
+        </Tabs>
+
+        <div className="filters" style={{ marginTop: 8 }}>
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Select allowClear placeholder="Durum" value={durumFilter} onChange={setDurumFilter} style={{ width: '100%' }}>
+                <Option value="Açık">Açık</Option>
+                <Option value="İşlemde">İşlemde</Option>
+                <Option value="Beklemede">Beklemede</Option>
+                <Option value="Çözüldü">Çözüldü</Option>
+                <Option value="Kapalı">Kapalı</Option>
+              </Select>
+            </Col>
+
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Select allowClear placeholder="Kategori" value={kategoriFilter} onChange={setKategoriFilter} style={{ width: '100%' }}>
+                <Option value="category1">category1</Option>
+                <Option value="category2">category2</Option>
+                <Option value="category3">category3</Option>
+              </Select>
+            </Col>
+
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Select allowClear placeholder="Öncelik" value={oncelikFilter} onChange={setOncelikFilter} style={{ width: '100%' }}>
+                <Option value="Düşük">Düşük</Option>
+                <Option value="Normal">Normal</Option>
+                <Option value="Yüksek">Yüksek</Option>
+                <Option value="Acil">Acil</Option>
+              </Select>
+            </Col>
+
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <RangePicker style={{ width: '100%' }} onChange={(d) => setDateRange(d)} />
+            </Col>
+          </Row>
+        </div>
+
+      </Card>
+
+      <Card>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: 24 }}>
+            <Spin size="large" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <Empty description={searchText || durumFilter || kategoriFilter ? 'Filtrelere uygun talep bulunamadı' : 'Henüz talep yok'} />
+        ) : (
+          <Table
+            columns={columns}
+            dataSource={filtered}
+            rowKey={(r) => r._id}
+            pagination={{ pageSize: 10 }}
+            scroll={{ x: 1200 }}
+          />
+        )}
+      </Card>
     </div>
   );
-};
-export default TalepListesi;
+}

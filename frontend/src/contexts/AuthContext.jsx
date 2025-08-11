@@ -1,110 +1,76 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
+import React,{createContext,useContext,useState,useEffect} from 'react';
+import api from '../utils/axios';
 
-const AuthContext = createContext();
+const AuthContext=createContext();
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+export const useAuth=()=>{
+  const context=useContext(AuthContext);
+  if(!context){
+    throw new Error('useAuth yalnızca AuthProvider içinde kullanılabilir');
   }
   return context;
 };
+export const AuthProvider=({children})=>{
+  const [user, setUser]=useState(null);
+  const [token,setToken]=useState(localStorage.getItem('token'));
+  const [loading,setLoading]=useState(true);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
-  const [loading, setLoading] = useState(true);
-
-  // Axios interceptor'ı ayarla
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-    } else {
-      delete axios.defaults.headers.common['Authorization'];
-    }
-  }, [token]);
-
-  // Sayfa yüklendiğinde token kontrolü
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (token) {
-        try {
-          const response = await axios.get('http://localhost:5000/api/users/profile');
-          setUser(response.data);
-        } catch (error) {
-          console.error('Token doğrulama hatası:', error);
+  useEffect(()=>{
+    const checkAuth=async()=>{
+      if(token){
+        try{
+          const response=await api.get('/user/profile',{
+            headers:{Authorization:`Bearer ${token}`}
+          });
+          if(response.data && response.data.success){
+            setUser(response.data.data);
+          } else{
+            logout();
+          }
+        } catch(error){
+          console.error('Token doğrulama hatası: ',error);
           logout();
         }
       }
       setLoading(false);
     };
-
     checkAuth();
-  }, [token]);
-
-  const login = async (email, password) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/users/login', {
-        email,
-        password
-      });
-
-      const { user: userData, token: authToken } = response.data;
-      
-      setUser(userData);
-      setToken(authToken);
-      localStorage.setItem('token', authToken);
-      
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Giriş yapılırken bir hata oluştu' 
-      };
+  },[token]);
+  const login=async(email,password)=>{
+    try{
+      const response=await api.post('/user/login',{email,password});
+      if(response.data && response.data.success){
+        const {user, token:authToken}=response.data;
+        setUser(user);
+        setToken(authToken);
+        localStorage.setItem('token', authToken);
+        return true;
+      }
+      else{
+        throw new Error(response.data?.message || 'Giriş başarısız. Lütfen bilgilerinizi kontrol edin.');
+      }
+    }catch(error){
+      console.error('Giriş hatası: ',error);
+      throw error;
     }
   };
-
-  const register = async (userData) => {
-    try {
-      const response = await axios.post('http://localhost:5000/api/users/register', userData);
-      
-      const { user: newUser, token: authToken } = response.data;
-      
-      setUser(newUser);
-      setToken(authToken);
-      localStorage.setItem('token', authToken);
-      
-      return { success: true };
-    } catch (error) {
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Kayıt olurken bir hata oluştu' 
-      };
-    }
-  };
-
-  const logout = () => {
+  const logout=()=>{
     setUser(null);
     setToken(null);
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
   };
-
-  const value = {
+  const value={
     user,
     setUser,
     token,
     loading,
     login,
-    register,
     logout,
-    isAuthenticated: !!token
+    isAuthenticated:!!token
   };
-
-  return (
+  return(
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-}; 
+};

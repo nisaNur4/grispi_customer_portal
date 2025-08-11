@@ -1,162 +1,108 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, message, Divider } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined } from '@ant-design/icons';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import React,{useState} from "react";
+import {Card,Form,Input,Button,Typography,message,Alert} from 'antd';
+import { UserOutlined, LockOutlined, LoginOutlined, InfoCircleOutlined } from '@ant-design/icons';
+import {useNavigate} from 'react-router-dom';
+import { useAuth } from "../contexts/AuthContext";
 
-const { Title, Text } = Typography;
+const {Title,Text,Paragraph}=Typography;
 
-const Login = () => {
-  const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
+const Login=()=>{
+  const [form]=Form.useForm();
+  const navigate=useNavigate();
+  const {login}=useAuth();
+  const [loading,setLoading]=useState(false);
 
-  const onFinish = async (values) => {
+  const onFinish=async(values)=>{
     setLoading(true);
-    try {
-      const result = await login(values.email, values.password);
-      
-      if (result.success) {
-        message.success('Giriş başarılı!');
+    try{
+      const success=await login(values.email,values.password);
+      if(success){
+        message.success('Başarıyla giriş yapıldı.');
         navigate('/talepler');
-      } else {
-        message.error(result.message);
       }
-    } catch (error) {
-      message.error('Bir hata oluştu');
-    } finally {
+
+    }catch(error){
+      message.error(error.response?.data?.message || 'Giriş yapılırken bir hata oluştu.');
+    } finally{
       setLoading(false);
     }
   };
-
-  return (
-    <div style={{
-      minHeight: '100vh',
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px'
-    }}>
-      <Card
-        style={{
-          width: '100%',
-          maxWidth: '400px',
-          borderRadius: '16px',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-          border: 'none'
-        }}
-      >
-        <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <div style={{
-            width: '60px',
-            height: '60px',
-            background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)',
-            borderRadius: '16px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            margin: '0 auto 16px',
-            boxShadow: '0 4px 16px rgba(24, 144, 255, 0.2)'
-          }}>
-            <span style={{ color: '#fff', fontSize: '28px', fontWeight: 'bold' }}>G</span>
-          </div>
-          <Title level={2} style={{ margin: 0, color: '#222' }}>
-            Grispi Portalı
-          </Title>
-          <Text type="secondary" style={{ fontSize: '16px' }}>
-            Hesabınıza giriş yapın
-          </Text>
-        </div>
-
-        <Form
-          name="login"
-          onFinish={onFinish}
-          layout="vertical"
-          size="large"
-        >
-          <Form.Item
-            name="email"
-            rules={[
-              { required: true, message: 'Email adresinizi giriniz!' },
-              { type: 'email', message: 'Geçerli bir email adresi giriniz!' }
-            ]}
-          >
-            <Input
-              prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="Email adresiniz"
-              style={{ borderRadius: '8px', height: '48px' }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="password"
-            rules={[
-              { required: true, message: 'Şifrenizi giriniz!' },
-              { min: 6, message: 'Şifre en az 6 karakter olmalıdır!' }
-            ]}
-          >
-            <Input.Password
-              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
-              placeholder="Şifreniz"
-              style={{ borderRadius: '8px', height: '48px' }}
-            />
-          </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={loading}
-              style={{
-                width: '100%',
-                height: '48px',
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)',
-                border: 'none',
-                fontSize: '16px',
-                fontWeight: '600'
-              }}
-            >
-              Giriş Yap
-            </Button>
-          </Form.Item>
-        </Form>
-
-        <Divider style={{ margin: '24px 0' }}>
-          <Text type="secondary">veya</Text>
-        </Divider>
-
-        <div style={{ textAlign: 'center' }}>
-          <Text type="secondary">Hesabınız yok mu? </Text>
-          <Link 
-            to="/register" 
-            style={{ 
-              color: '#1890ff', 
-              fontWeight: '600',
-              textDecoration: 'none'
-            }}
-          >
-            Kayıt olun
-          </Link>
-        </div>
-
-        <div style={{ 
-          marginTop: '24px', 
-          padding: '16px', 
-          background: '#f6ffed', 
-          borderRadius: '8px',
-          border: '1px solid #b7eb8f'
+  return(
+    <div className="page-container">
+      <div style={{
+        minHeight:'100vh',
+        display:'flex',
+        alignItems:'center',
+        justifyContent:'center',
+        padding:'24px'
+      }}>
+        <Card style={{
+          maxWidth:'400px',
+          borderRadius:'16px',
         }}>
-          <Text type="secondary" style={{ fontSize: '14px' }}>
-            <strong>Demo Hesap:</strong><br />
-            Email: ahmet.yilmaz@example.com<br />
-            Şifre: 123456
-          </Text>
-        </div>
-      </Card>
+          <div style={{
+            textAlign:'center',
+            marginBottom:32
+          }}>
+            <div style={{
+              width:64,
+              height:64,
+              background:'linear-gradient(45deg, #FFE066 0%, #FF6F00 25%, #6A1B9A  100%)',
+              borderRadius:'16px',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+              margin:'0 auto 16px',
+            }}>
+              <LoginOutlined style={{
+                fontSize:'32px',
+                color:'white'
+              }}/>
+            </div>
+            <Title level={2}>Hoş Geldiniz</Title>
+            <Text type="secondary">Grispi Customer Portal'a Giriş Yapın</Text>
+          </div>
+          <Alert message="Örnek Kullanıcı Bilgileri" description={
+            <div>
+              <Text strong>
+                E-posta: 
+              </Text> grispi@grispi.com.tr
+              <br/>
+              <Text strong>
+                Şifre: 
+              </Text> 123456
+            </div>
+          } type="info" showIcon icon={<InfoCircleOutlined/>}/>
+          <Form form={form} layout="vertical" onFinish={onFinish} size="large">
+            <Form.Item name="email" label="E-posta" rules={[
+              {required:true, message:'E-posta adresinizi girin.'},
+              {type:'email', message:'Geçerli bir e-posta adresi girin'}
+            ]}>
+              <Input prefix={<UserOutlined/>} placeholder="ornek@email.com"/>
+            </Form.Item>
+            <Form.Item name="password" label="şifre" rules={[
+              {required:true,message:'Şifrenizi girin'},
+              {min:6,message:'Şifre en az 6 karakter olmalı'}
+            ]}>
+              <Input.Password prefix={<LockOutlined/>} placeholder="Şifreniz"/>
+            </Form.Item>
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading} icon={<LoginOutlined/>} style={{width:'100%'}}>
+                {loading ? 'Giriş Yapılıyor..':'Giriş Yap'}
+              </Button>
+            </Form.Item>
+          </Form>
+          <div style={{textAlign:'center', marginTop:24}}>
+            <Paragraph>
+              Hesabınız yok mu? Sistem yöneticisi ile iletişime geçin.
+            </Paragraph>
+            <Text type="secondary" style={{fontSize:'12px'}}>
+              Grispi Customer Portal
+            </Text>
+          </div>
+        </Card>
+      </div>
     </div>
-  );
-};
-
-export default Login; 
+  )
+}
+export default Login;

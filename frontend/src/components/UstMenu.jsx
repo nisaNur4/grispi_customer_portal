@@ -1,200 +1,155 @@
-import React from 'react';
-import { Layout, Menu, Avatar,Dropdown,Space, Button,Typography } from 'antd';
-import { 
-  PlusOutlined, 
-  FileTextOutlined,
-  UserOutlined,
-  SettingOutlined,
-  LogoutOutlined,
-  BellOutlined
-} from '@ant-design/icons';
-import {useNavigate,useLocation} from 'react-router-dom';
+import React,{useState} from 'react';
+import { Layout,Menu,Button,Typography,Dropdown,Badge,Tooltip } from 'antd';
+import { UserOutlined,LogoutOutlined,BellOutlined,QuestionCircleOutlined,FileTextOutlined,PlusOutlined } from '@ant-design/icons';
+import { useNavigate,useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import '../App.css';
 
-const { Header } = Layout;
-const { Text } = Typography;
+const {Header}=Layout;
+const {Text}=Typography;
 
-const UstMenu = () => {
-  const navigate = useNavigate();  // Sayfa yönlendirmesi için
-  const location = useLocation();  // Mevcut sayfa bilgisi için
-  const { user, logout } = useAuth();
+const UstMenu=()=>{
+  const navigate=useNavigate();
+  const location=useLocation();
+  const {user,logout}=useAuth();
+  const [notificationCount]=useState(0);
 
-  const menuItems = [
+  const handleLogout=()=>{
+    logout();
+    navigate('/login');
+  };
+  const userMenuItems=[
     {
-      key: '/talepler',
-      icon: <FileTextOutlined />,
-      label: 'Taleplerim',
-      onClick: () => navigate('/talepler')
-    },
-    {
-      key: '/talep-olustur',
-      icon: <PlusOutlined />,
-      label: 'Yeni Talep',
-      onClick: () => navigate('/talep-olustur')
-    }
-  ];
-
-  const userMenuItems = [
-    {
-      key: 'profile',
-      icon: <UserOutlined />,
-      label: 'Profil',
-      onClick: () => navigate('/profil')  
-    },
-    {
-      key: 'settings',
-      icon: <SettingOutlined />,
-      label: 'Ayarlar',
-      onClick: () => console.log('Ayarlar tıklandı')
-    },
-    {
-      type: 'divider'
-    },
-    {
-      key: 'logout',
-      icon: <LogoutOutlined />,
-      label: 'Çıkış Yap',
-      onClick: () => {
-        logout();
-        navigate('/login');
-      }
-    }
-  ];
-
-  return (
-    <Header style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      background: '#fff',
-      padding: '0 40px',
-      boxShadow: '0 2px 12px rgba(24,144,255,0.06)',
-      borderBottom: '1.5px solid #e8e8e8',
-      height: '72px',
-      position: 'sticky',
-      top: 0,
-      zIndex: 1000
-    }}>
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center',
-        gap: '14px',
-        minWidth: 220
-      }}>
+      key:'grispi',
+      icon:(
         <div style={{
-          width: '40px',
-          height: '40px',
-          background: 'linear-gradient(135deg, #1890ff 0%, #40a9ff 100%)',
-          borderRadius: '10px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#fff',
-          fontSize: '22px',
-          fontWeight: 'bold',
-          boxShadow: '0 2px 8px rgba(24,144,255,0.10)'
+          width:40,
+          textAlign:'center',
+          height:40,
+          background:'#6A1B9A',
+          borderRadius:'17px',
+          display:'flex',
+          alignItems:'center',
+          justifyContent:'center',
         }}>
-          G
+          <Text style={{
+            color:'white',
+            fontSize:'40px',
+          }}>G</Text>
         </div>
+      ),
+      label:(
         <div>
-          <div style={{ 
-            fontSize: '20px', 
-            fontWeight: 700, 
-            color: '#222',
-            lineHeight: '1.2',
-            letterSpacing: '0.5px'
-          }}>
-            Grispi Müşteri Portalı
+          <div>
+            <strong>
+              {`${user?.ad || ''} ${user?.soyad||''}`.trim()}
+            </strong>
           </div>
-          <div style={{ 
-            fontSize: '13px', 
-            color: '#8c8c8c',
-            lineHeight: '1.2',
-            fontWeight: 500
+          <div style={{
+            fontSize:'12px',
+            color:'#999'
           }}>
-            Müşteri Destek Sistemi
+            {user?.email||'eposta@example.com'}
           </div>
         </div>
-      </div>
-      
-      {/*Navigasyon menüsü */}
-      <Menu
-        mode="horizontal"
-        selectedKeys={[location.pathname]}
-        items={menuItems}
-        style={{ 
-          border: 'none',
-          background: 'transparent',
-          flex: 1,
-          justifyContent: 'center',
-          fontSize: 16,
-          fontWeight: 600,
-          gap: 32
-        }}
-      />
+      )
+    },
+    {
+        type:'divider'
+    },
+    {
+        key:'profile',
+        icon:<UserOutlined style={{fontSize:'24px'}}/>,
+        label:'Profil',
+        onClick:()=>navigate('/profil')
+    },
+    {
+      key:'help',
+      icon:<QuestionCircleOutlined style={{fontSize:'24px'}}/>,
+      label:'Yardım',
+      onClick:()=>navigate('/yardim')
+    },
+    {
+      type:'divider'
+    },
+    {
+      key:'logout',
+      icon:<LogoutOutlined style={{fontSize:'24px'}}/>,
+      label:'Çıkış Yap',
+      onClick: handleLogout
+    }
+  ];
 
-      {/*Kullanıcı menüsü ve bildirimler*/}
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center',
-        gap: '20px',
-        minWidth: 180,
-        justifyContent: 'flex-end'
+  const notificationItems=[{}];
+  return(
+    <Header style={{
+      background:'#f1f1f1',
+      padding:'0 24px',
+      height:'64px',
+      lineHeight:'64px',
+      display:'flex',
+      alignItems:'center',
+      justifyContent:'space-between'
+    }}>
+      <div style={{
+        display:'flex',
+        alignItems:'center'
       }}>
-        {/* Bildirimler*/}
-        <Button
-          type="text"
-          icon={<BellOutlined style={{ fontSize: 22 }} />}
-          style={{ 
-            width: '44px', 
-            height: '44px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            background: '#f7faff',
-            boxShadow: '0 2px 8px rgba(24,144,255,0.06)'
+        <Menu mode="horizontal" selectedKeys={[location.pathname]} style={{
+          background:'transparent',
+          border:'none'
+        }}>
+          <Menu.Item key="/talepler" icon={<FileTextOutlined/>} onClick={()=>navigate('/talepler')} className="custom-hover">
+            Taleplerim
+          </Menu.Item>
+          <Menu.Item key="/talep-olustur" icon={<PlusOutlined/>} onClick={()=>navigate('/talep-olustur')} className="custom-hover">
+            Yeni Talep
+          </Menu.Item>
+        </Menu>
+      </div>
+      <div style={{
+        display:'flex',
+        alignItems:'center',
+        gap:'16px'
+      }}>
+        <Tooltip title="Bildirimler">
+          <Dropdown menu={{
+            items:notificationItems
           }}
-          onClick={() => console.log('Bildirimler tıklandı')}
-        />
-
-        {/* Kullanıcı menüsü*/}
-        <Dropdown
-          menu={{ items: userMenuItems }}
           placement="bottomRight"
-          trigger={['click']}
-        >
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            cursor: 'pointer',
-            padding: '6px 12px',
-            borderRadius: '8px',
-            transition: 'background-color 0.2s',
-            background: '#f7faff',
-            boxShadow: '0 2px 8px rgba(24,144,255,0.06)'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#e6f7ff'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#f7faff'}
-          >
-            <Avatar 
-              icon={<UserOutlined />} 
-              size={36}
-              style={{ backgroundColor: '#1890ff', fontSize: 20 }}
-            />
-            <Space direction="vertical" size={0} style={{ lineHeight: '1.2' }}>
-              <Text style={{ fontSize: '15px', fontWeight: 600, color: '#222' }}>
-                {user ? `${user.firstName} ${user.lastName}` : 'Kullanıcı'}
-              </Text>
-              <Text style={{ fontSize: '12px', color: '#8c8c8c', fontWeight: 500 }}>
-                {user ? user.email : 'Müşteri'}
-              </Text>
-            </Space>
+          trigger={['click']}>
+            <Badge count={notificationCount} size="small">
+              <Button type="text" icon={<BellOutlined style={{
+                fontSize:'24px'
+              }}/>} size="large" className="notification-btn" />
+            </Badge>
+          </Dropdown>
+        </Tooltip>
+        <Dropdown menu={{
+          items:userMenuItems
+        }} placement="bottomRight" trigger={['click']}>
+          <div className="user-menu">
+            <div style={{
+              width:40,
+              textAlign:'center',
+              height:40,
+              background:'#6A1B9A',
+              borderRadius:'17px',
+              display:'flex',
+              alignItems:'center',
+              justifyContent:'center',
+            }}>
+              <Text style={{
+                color:'white',
+                fontSize:'40px'
+              }}>G</Text>
+            </div>
           </div>
         </Dropdown>
       </div>
     </Header>
   );
 };
+
+
 export default UstMenu; 
