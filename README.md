@@ -54,59 +54,7 @@ Grispi Müşteri Portalı, müşteri destek süreçlerini dijitalleştirmek ve k
 - **Error Handling** - Kullanıcı dostu hata mesajları
 ---
 
-## Veri Modelleri
 
-### User Model
-{
-  firstName: String,     
-  lastName: String,      
-  email: String,         
-  phone: String,        
-  address: String,     
-  password: String,      
-  role: String,          
-  createdAt: Date,
-  updatedAt: Date
-}
-
-### Ticket Model
-{
-  kullaniciId: ObjectId,     
-  kullaniciAdi: String,     
-  kullaniciEmail: String, 
-  talepNumarasi: String, 
-  baslik: String,       
-  aciklama: String, 
-  kategori: String,   
-  oncelik: String, 
-  durum: String,
-  mesajlar: [{
-    gonderen: String,
-    mesaj: String,
-    gondermeTarihi: Date
-  }],
-  sonGuncelleme: Date,
-  createdAt: Date,
-  updatedAt: Date
-}
----
-
-## API Endpoints
-
-### Authentication
-POST   /api/users/register     # Kullanıcı kaydı
-POST   /api/users/login        # Kullanıcı girişi
-
-### User Management
-GET    /api/users/profile          # Profil bilgileri
-PUT    /api/users/profile          # Profil güncelleme
-PUT    /api/users/change-password  # Şifre değiştirme
-### Ticket Management
-GET    /api/ticket             # Kullanıcının talepleri
-GET    /api/ticket/:id         # Talep detayı
-POST   /api/ticket             # Yeni talep oluşturma
-POST   /api/ticket/:id/message # Talebe mesaj ekleme
----
 
 ## Kurulum ve Çalıştırma
 
