@@ -105,19 +105,19 @@ Grispi Müşteri Portalı, müşteri destek süreçlerini dijitalleştirmek ve k
 ## API Endpoints
 
 ### Authentication
-POST /api/users/register     # Kullanıcı kaydı  
-POST /api/users/login        # Kullanıcı girişi  
+POST /api/users/register      
+POST /api/users/login  
 
 ### User Management
-GET  /api/users/profile          # Profil bilgileri  
-PUT  /api/users/profile          # Profil güncelleme  
-PUT  /api/users/change-password  # Şifre değiştirme  
+GET  /api/users/profile       
+PUT  /api/users/profile  
+PUT  /api/users/change-password   
 
 ### Ticket Management
-GET  /api/ticket             # Kullanıcının talepleri  
-GET  /api/ticket/:id         # Talep detayı  
-POST /api/ticket             # Yeni talep oluşturma  
-POST /api/ticket/:id/message # Talebe mesaj ekleme  
+GET  /api/ticket     
+GET  /api/ticket/:id  
+POST /api/ticket     
+POST /api/ticket/:id/message 
 
 ---
 
@@ -144,14 +144,6 @@ npm run dev
 
 ---
 
-## Test Senaryoları
-- Kullanıcı kaydı, giriş, token doğrulama  
-- Talep oluşturma, listeleme, detay görüntüleme  
-- Mesaj ekleme, filtreleme, arama  
-- Profil güncelleme, şifre değiştirme  
-
----
-
 ## Güvenlik Özellikleri
 - JWT Authentication  
 - Password Hashing  
@@ -162,8 +154,6 @@ npm run dev
 ---
 
 ## Görseller
-# Proje Görselleri
-
 ## Giriş
 ![Giriş](./gorsel/giris.png)
 
